@@ -4,6 +4,7 @@
 #include <time.h>
 #include "sha256.c"
 #define STR_BUFF_SIZE 1024
+#define WTHDR_STP 10000000
 
 int numDigs(unsigned long long num){
 	if(num == 0)
@@ -67,7 +68,7 @@ int main(int argc, char const *argv[])
 	scanf("%i", &ldZerrs);
 	if(ldZerrs > 64){ printf("ERROR: number of leading zeros is to big!\n"); return 1; }
 	if(ldZerrs < 0){ printf("ERROR: number of leading zeros cannot be negative!\n"); return 2; }
-	printf("wait...\n\n");
+	printf("wait...\n");
 
 	long int timeBuffStart = time(NULL);
 	char* numBuff = NULL;
@@ -82,10 +83,12 @@ int main(int argc, char const *argv[])
 		numBuff = itoa(num++);
 		tmpInput = inputGen(strBuff, numBuff);
 		shaOutput = SHA256(tmpInput);
+		if(num % WTHDR_STP == 0)
+			printf("%llu combinations tested\n", num);
 	}while(!leadZerros(shaOutput, ldZerrs));
 	long int timeBuffEnd = time(NULL);
 
-	printf("your string is: '%s'\nyour hash is: '%s'\ntime: %ldmin. %ldsec.\n", 
-		tmpInput, shaOutput, (timeBuffEnd-timeBuffStart)/60, (timeBuffEnd-timeBuffStart)%60);
+	printf("%llu combinations tested\nyour string is: '%s'\nyour hash is: '%s'\ntime: %ldmin. %ldsec.\n", 
+		num-1, tmpInput, shaOutput, (timeBuffEnd-timeBuffStart)/60, (timeBuffEnd-timeBuffStart)%60);
 	return 0;
 }
